@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const socketio = require("socket.io");
 const io = socketio(http);
 const mongoDB = "mongodb://localhost:27017/chatroom";
-mongoose.connect(mongoDB).then(()=>console.log('connected')).catch(isError=>console.log(error));
+mongoose.connect(mongoDB).then(()=>console.log('connected')).catch(error=>console.log(error));
 const {addUser, getUser, removeUser} = require('./helper');
 const PORT = process.env.port || 5000;
 const Room = require('./models/Room');
@@ -24,7 +24,6 @@ app.use(cookieParser());
 app.use(authRoutes);
 
 io.on('connection', (socket) => {
-  console.log(socket.id);
   Room.find().then(result=>{
     socket.emit("output-rooms", result);
   })
@@ -54,7 +53,6 @@ io.on('connection', (socket) => {
       room_id,
       text:message
     }
-    console.log('message', msgToStore);
     const msg = new Message(msgToStore);
     msg.save().then(result=>{
       io.to(room_id).emit('message', msgToStore);
